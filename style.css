@@ -1,0 +1,477 @@
+/* ==========================================================================
+   1. ROOT VARIABLES & RESET
+   ========================================================================== */
+:root {
+    --bg-gradient: linear-gradient(135deg, #ffe5ec 0%, #f0e6ff 50%, #ffffff 100%);
+    --primary-pink: #ffb3c6;
+    --dark-pink: #ff758f;
+    --soft-white: #fff0f3;
+    --letter-bg: #ffffff;
+    --shadow-premium: rgba(255, 117, 143, 0.15) 0px 10px 30px 0px;
+    --shadow-soft: rgba(0, 0, 0, 0.06) 0px 8px 24px;
+    
+    --font-main: 'Quicksand', sans-serif;
+    --font-heading: 'Poppins', sans-serif;
+    --font-script: 'Dancing Script', cursive;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: var(--font-main);
+    background: var(--bg-gradient);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-x: hidden;
+    position: relative;
+    padding: 20px 10px;
+}
+
+/* Background Canvas */
+#particleCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Main Container */
+.card-container {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+}
+
+/* ==========================================================================
+   2. ANIMATIONS DESIGNS (CSS TRANSITION & TRANSFORM)
+   ========================================================================== */
+@keyframes floatingSoft {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+    100% { transform: translateY(0px); }
+}
+
+@keyframes bounceSoft {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-5px) scale(1.01); }
+}
+
+@keyframes flicker {
+    0%, 100% { transform: scale(1) rotate(-1deg); opacity: 0.9; }
+    20% { transform: scale(1.1) rotate(2deg); opacity: 1; }
+    40% { transform: scale(0.95) rotate(-2deg); opacity: 0.85; }
+    60% { transform: scale(1.05) rotate(1deg); opacity: 0.95; }
+    80% { transform: scale(1) rotate(-1deg); opacity: 0.9; }
+}
+
+@keyframes shadowScale {
+    0%, 100% { transform: scaleX(1); opacity: 0.2; }
+    50% { transform: scaleX(0.9); opacity: 0.12; }
+}
+
+@keyframes envelopeShake {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-3deg); }
+    75% { transform: rotate(3deg); }
+}
+
+/* ==========================================================================
+   3. HEADERS SECTION
+   ========================================================================== */
+.header-section {
+    text-align: center;
+    animation: floatingSoft 4s ease-in-out infinite;
+}
+
+.main-title {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 2.8rem;
+    color: #ff4d6d;
+    text-shadow: 0 0 15px rgba(255, 77, 109, 0.3), 0 0 2px rgba(255,255,255,0.8);
+    letter-spacing: -1px;
+}
+
+.subtitle {
+    font-size: 1.05rem;
+    color: #594a4e;
+    margin-top: 5px;
+    font-weight: 700;
+}
+
+/* ==========================================================================
+   4. CAKE ARCHITECTURE
+   ========================================================================== */
+.cake-section {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.cake-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: bounceSoft 5s ease-in-out infinite;
+    position: relative;
+}
+
+/* Candle */
+.candle {
+    width: 8px;
+    height: 35px;
+    background: linear-gradient(to right, #ffccd5, #fff);
+    border-radius: 4px;
+    position: relative;
+    z-index: 5;
+    margin-bottom: -2px;
+}
+
+.flame {
+    width: 12px;
+    height: 20px;
+    background: radial-gradient(circle at bottom, #ffb703, #ff4d6d 90%);
+    border-radius: 50% 50% 20% 20% / 60% 60% 40% 40%;
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: flicker 0.6s infinite alternate;
+    box-shadow: 0 0 15px #ffb703;
+}
+
+/* Cake Base Spec */
+.cake-layer {
+    background: #fff0f3;
+    position: relative;
+    border-radius: 12px 12px 4px 4px;
+    box-shadow: inset 0 -4px 0px rgba(0,0,0,0.03);
+}
+
+.layer-top {
+    width: 110px;
+    height: 40px;
+    background: #ffccd5;
+    z-index: 4;
+}
+
+.layer-middle {
+    width: 150px;
+    height: 45px;
+    background: #ffb3c6;
+    margin-top: -4px;
+    z-index: 3;
+}
+
+.layer-bottom {
+    width: 190px;
+    height: 50px;
+    background: #ff8fa3;
+    margin-top: -4px;
+    z-index: 2;
+}
+
+/* Cream Dripping Details */
+.dripping {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 12px;
+    background: #ffffff;
+    border-radius: 20px;
+    opacity: 0.85;
+}
+
+/* Cake Stand */
+.cake-stand {
+    width: 220px;
+    height: 10px;
+    background: #f7d6e0;
+    border-radius: 20px;
+    margin-top: -2px;
+    z-index: 1;
+    box-shadow: var(--shadow-soft);
+}
+
+.cake-shadow {
+    width: 180px;
+    height: 10px;
+    background: rgba(0, 0, 0, 1);
+    border-radius: 50%;
+    margin-top: 8px;
+    animation: shadowScale 5s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   5. ENVELOPE ARCHITECTURE (3D SYSTEM)
+   ========================================================================== */
+.envelope-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.envelope-hint {
+    font-size: 0.9rem;
+    color: #a3888e;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.envelope-wrapper {
+    position: relative;
+    width: 280px;
+    height: 190px;
+    background-color: transparent;
+    cursor: pointer;
+    perspective: 1000px; /* Cung cấp không gian 3D cho Flap */
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.envelope-wrapper:hover {
+    transform: scale(1.03);
+}
+
+/* Container chính của mô hình Phong Bì để giới hạn Layer Thư */
+.envelope-body {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    bottom: 0;
+    left: 0;
+    background-color: #ffccd5;
+    border-radius: 8px;
+    box-shadow: var(--shadow-premium);
+    overflow: visible; /* Cho phép nắp mở ngược lên trên */
+}
+
+/* Back Face */
+.envelope-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #ffa6c9;
+    border-radius: 8px;
+    z-index: 1;
+}
+
+/* Cắt nếp gấp bằng clip-path giúp tăng hiệu năng render phẳng mịn trên các dòng điện thoại */
+.envelope-left {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #ffb3c6;
+    clip-path: polygon(0% 0%, 50% 50%, 0% 100%);
+    border-radius: 8px 0 0 8px;
+    z-index: 3;
+}
+
+.envelope-right {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #ffa3b1;
+    clip-path: polygon(100% 0%, 50% 50%, 100% 100%);
+    border-radius: 0 8px 8px 0;
+    z-index: 3;
+}
+
+.envelope-bottom {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #ff8fa3;
+    clip-path: polygon(0% 100%, 50% 48%, 100% 100%);
+    border-radius: 0 0 8px 8px;
+    z-index: 4;
+}
+
+/* Top Flap (Nắp phong bì xoay 3D) */
+.envelope-top-flap {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #ffccd5;
+    clip-path: polygon(0% 0%, 50% 50%, 100% 0%);
+    border-radius: 8px 8px 0 0;
+    top: 0;
+    left: 0;
+    transform-origin: top center;
+    transform: rotateX(0deg);
+    transition: transform 0.4s ease, z-index 0.2s;
+    z-index: 5; /* Ban đầu đè lên trên tất cả */
+}
+
+/* ==========================================================================
+   6. THE LETTER (NỘI DUNG LÁ THƯ KHÔNG OVERLAP)
+   ========================================================================== */
+.letter {
+    position: absolute;
+    width: 90%;
+    height: 90%;
+    background: var(--letter-bg);
+    left: 5%;
+    bottom: 5%;
+    border-radius: 6px;
+    padding: 15px;
+    box-shadow: var(--shadow-soft);
+    z-index: 2; /* Nằm giữa Back và các cánh bên hông */
+    transform: translateY(0);
+    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), 
+                height 0.5s ease, 
+                width 0.5s ease,
+                left 0.5s ease;
+    
+    /* Thiết lập chống tràn chữ cực tốt */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; 
+    border: 1px dashed #ffb3c6;
+}
+
+.letter-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+    text-align: center;
+    opacity: 0.3; /* Ẩn mờ chữ khi chưa mở hẳn */
+    transition: opacity 0.3s;
+}
+
+.letter-heading {
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+    color: #df4759;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.letter-body {
+    font-size: 0.8rem;
+    line-height: 1.4;
+    color: #4a4a4a;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+}
+
+.letter-signature {
+    font-family: var(--font-script);
+    font-size: 1.2rem;
+    color: #ff4d6d;
+    margin-top: 5px;
+    text-align: right;
+}
+
+/* ==========================================================================
+   7. INTERACTIVE ACTIVATED STATES (ĐIỀU KHIỂN BẰNG JS)
+   ========================================================================== */
+   
+/* Kích hoạt trạng thái mở phong bì */
+.envelope-wrapper.open .envelope-top-flap {
+    transform: rotateX(180deg);
+    z-index: 1; /* Đẩy ra sau để giải phóng không gian cho bức thư trồi lên */
+}
+
+/* Kích hoạt trạng thái trượt và phóng to lá thư điện tử cao cấp */
+.envelope-wrapper.open .letter {
+    /* Trượt lên vượt mặt phong bì, đồng thời scale rộng mở để dễ đọc nội dung */
+    transform: translateY(-130px) scale(1.15);
+    height: 250px;
+    width: 105%;
+    left: -2.5%;
+    z-index: 10; /* Nhảy lên bề mặt cao nhất */
+    box-shadow: rgba(255, 117, 143, 0.25) 0px 20px 40px;
+}
+
+.envelope-wrapper.open .letter-content {
+    opacity: 1; /* Hiện rõ nét chữ */
+}
+
+/* Hiệu ứng Shake phong bì khi có Sparkle Burst */
+.shake-envelope {
+    animation: envelopeShake 0.4s ease-in-out;
+}
+
+/* ==========================================================================
+   8. MUSIC BUTTON CONTROL UI
+   ========================================================================== */
+.music-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    border: none;
+    color: #ff758f;
+    box-shadow: var(--shadow-soft);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.music-btn:hover {
+    transform: scale(1.08);
+    background-color: var(--soft-white);
+}
+
+.music-btn.playing {
+    background-color: #ff758f;
+    color: #ffffff;
+    box-shadow: 0 0 12px rgba(255, 117, 143, 0.4);
+}
+
+/* ==========================================================================
+   9. RESPONSIVE DESIGN FOR ULTRA-SMALL SCREENS (< 380px)
+   ========================================================================== */
+@media (max-width: 380px) {
+    .main-title {
+        font-size: 2.2rem;
+    }
+    .subtitle {
+        font-size: 0.9rem;
+    }
+    .envelope-wrapper {
+        width: 250px;
+        height: 170px;
+    }
+    .envelope-wrapper.open .letter {
+        transform: translateY(-110px) scale(1.15);
+        height: 230px;
+    }
+    .letter-heading {
+        font-size: 0.85rem;
+    }
+    .letter-body {
+        font-size: 0.75rem;
+        line-height: 1.3;
+    }
+}
